@@ -13,21 +13,8 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue: #6A9FD8;
-      --blue-light: #D6E6F5;
       --green: #7DC47F;
       --green-light: #D9F0DA;
-      --orange: #EFA85A;
-      --orange-light: #FAEBD7;
-      --yellow: #E8D44D;
-      --yellow-light: #FBF5D0;
-      --teal: #5BBAA6;
-      --teal-light: #D4F0EA;
-      --beige: #BBA87A;
-      --beige-light: #F0E8D8;
-      --purple: #A07CC0;
-      --purple-light: #E8DCF0;
-      --gold: #C8941E;
       --radius: 14px;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
@@ -127,9 +114,7 @@
     }
 
     /* ===== QUIZ PAGES ===== */
-    .quiz-page {
-      padding: 0;
-    }
+    .quiz-page { padding: 0; }
 
     .quiz-header {
       position: sticky;
@@ -187,9 +172,7 @@
       line-height: 1.4;
     }
 
-    .option-btn:active {
-      transform: scale(0.97);
-    }
+    .option-btn:active { transform: scale(0.97); }
 
     .option-btn.selected {
       border-color: #fff;
@@ -241,87 +224,42 @@
       transition: transform 0.15s;
     }
 
-    .back-btn:active {
-      transform: scale(0.95);
-    }
+    .back-btn:active { transform: scale(0.95); }
 
-    /* ===== KIDS MODAL ===== */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: rgba(0,0,0,0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    .modal-overlay.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal {
-      background: #fff;
-      border-radius: 20px;
-      padding: 28px 24px;
-      width: 100%;
-      max-width: 340px;
-      text-align: center;
-      transform: scale(0.9);
-      transition: transform 0.3s ease;
-    }
-
-    .modal-overlay.show .modal {
-      transform: scale(1);
-    }
-
-    .modal h3 {
-      font-size: 20px;
+    /* ===== INLINE KIDS PICKER ===== */
+    .kids-title {
+      font-size: clamp(18px, 4.5vw, 24px);
       font-weight: 700;
-      color: #333;
-      margin-bottom: 20px;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 4px;
     }
 
     .kids-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 12px;
+      padding: 8px;
     }
 
     .kid-btn {
       aspect-ratio: 1;
-      font-size: 22px;
+      font-size: clamp(24px, 6vw, 32px);
       font-weight: 700;
       font-family: 'Rubik', sans-serif;
       color: #333;
-      background: var(--green-light);
+      background: rgba(255,255,255,0.92);
       border: 3px solid transparent;
-      border-radius: 12px;
+      border-radius: 16px;
       cursor: pointer;
       transition: all 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
-    .kid-btn:active, .kid-btn.selected {
-      border-color: var(--green);
-      background: var(--green);
-      color: #fff;
-    }
-
-    .modal-cancel {
-      padding: 10px 24px;
-      font-size: 14px;
-      font-weight: 500;
-      font-family: 'Rubik', sans-serif;
-      color: #999;
-      background: none;
-      border: none;
-      cursor: pointer;
+    .kid-btn:active {
+      transform: scale(0.93);
+      border-color: #fff;
+      background: rgba(255,255,255,1);
     }
 
     /* ===== RESULTS PAGE ===== */
@@ -419,9 +357,7 @@
       transition: transform 0.15s;
     }
 
-    .restart-btn:active {
-      transform: scale(0.95);
-    }
+    .restart-btn:active { transform: scale(0.95); }
 
     .score-animate {
       animation: popIn 0.5s cubic-bezier(.2,1,.3,1) both;
@@ -435,7 +371,6 @@
 </head>
 <body>
 
-  <!-- LANDING PAGE -->
   <div id="landing" class="page active">
     <div class="lion-emoji">🦁</div>
     <h1 class="landing-title">מחשבון הארי המקטר</h1>
@@ -443,27 +378,15 @@
     <button class="cta-btn" onclick="startQuiz()">🔥 חשב נקודות קיטור</button>
   </div>
 
-  <!-- QUIZ PAGES (rendered by JS) -->
   <div id="quiz" class="page quiz-page hidden-left"></div>
 
-  <!-- RESULTS PAGE -->
   <div id="results" class="page hidden-left"></div>
-
-  <!-- KIDS MODAL (must be last in DOM for mobile z-index) -->
-  <div id="kidsModal" class="modal-overlay">
-    <div class="modal">
-      <h3>כמה ילדים קטנים?</h3>
-      <div class="kids-grid" id="kidsGrid"></div>
-      <button class="modal-cancel" onclick="closeKidsModal()">ביטול</button>
-    </div>
-  </div>
 
 <script>
 const CATEGORIES = [
   {
     id: 'shelter',
     title: 'סוג מרחב מוגן',
-    color: 'var(--blue)',
     bg: 'linear-gradient(170deg, #8BB8E8 0%, #5A8CC8 100%)',
     options: [
       { text: 'ממ"ד', points: 1 },
@@ -476,7 +399,6 @@ const CATEGORIES = [
   {
     id: 'family',
     title: 'מצב משפחתי',
-    color: 'var(--green)',
     bg: 'linear-gradient(170deg, #96D898 0%, #5DAF60 100%)',
     options: [
       { text: 'בזוגיות בלי ילדים קטנים', points: 0 },
@@ -488,7 +410,6 @@ const CATEGORIES = [
   {
     id: 'warDamage',
     title: 'נזקי מלחמה',
-    color: 'var(--orange)',
     bg: 'linear-gradient(170deg, #F5C078 0%, #E09030 100%)',
     options: [
       { text: 'נפל רסיס על דירה שאני שוכר', points: 5 },
@@ -500,7 +421,6 @@ const CATEGORIES = [
   {
     id: 'military',
     title: 'מילואים',
-    color: 'var(--yellow)',
     bg: 'linear-gradient(170deg, #F0E070 0%, #D4B830 100%)',
     options: [
       { text: 'גם אני גם בן/בת זוגי לא במילואים', points: 0 },
@@ -512,7 +432,6 @@ const CATEGORIES = [
   {
     id: 'employment',
     title: 'מצב תעסוקתי',
-    color: 'var(--teal)',
     bg: 'linear-gradient(170deg, #78CCB8 0%, #3EA08A 100%)',
     options: [
       { text: 'אני שכיר', points: 0 },
@@ -526,7 +445,6 @@ const CATEGORIES = [
   {
     id: 'misc',
     title: 'שונות',
-    color: 'var(--beige)',
     bg: 'linear-gradient(170deg, #D4C4A0 0%, #A89060 100%)',
     options: [
       { text: 'אני נהג דן', points: -2 },
@@ -537,7 +455,6 @@ const CATEGORIES = [
   {
     id: 'politics',
     title: 'נטייה פוליטית',
-    color: 'var(--purple)',
     bg: 'linear-gradient(170deg, #C0A0E0 0%, #8060B0 100%)',
     options: [
       { text: 'הצבעתי לביבי', points: -10 },
@@ -548,12 +465,13 @@ const CATEGORIES = [
 
 let currentStep = 0;
 let answers = {};
-let direction = 'forward';
+let pickingKids = false;
+let pendingKidsOption = -1;
 
 function startQuiz() {
   currentStep = 0;
   answers = {};
-  direction = 'forward';
+  pickingKids = false;
   renderQuiz();
   show('quiz', 'landing');
 }
@@ -562,13 +480,19 @@ function renderQuiz() {
   const cat = CATEGORIES[currentStep];
   const totalSteps = CATEGORIES.length;
   const progress = ((currentStep + 1) / totalSteps) * 100;
+
+  if (pickingKids) {
+    renderKidsPicker(cat);
+    return;
+  }
+
   const prev = answers[cat.id];
 
   let optionsHTML = cat.options.map((opt, i) => {
     const sel = prev && prev.optionIndex === i ? 'selected' : '';
     const pts = opt.points >= 0 ? `+${opt.points.toLocaleString()}` : opt.points.toLocaleString();
     const ptsLabel = opt.needsKids ? `${pts} × מס׳ ילדים` : pts;
-    return `<button class="option-btn ${sel}" ontouchend="event.preventDefault(); selectOption(${i})" onclick="selectOption(${i})">
+    return `<button class="option-btn ${sel}" onclick="selectOption(${i})">
       ${opt.text}
       <span class="points-badge">${ptsLabel} נק׳</span>
     </button>`;
@@ -595,11 +519,36 @@ function renderQuiz() {
   document.getElementById('quiz').style.background = cat.bg;
 }
 
+function renderKidsPicker(cat) {
+  const progress = ((currentStep + 1) / CATEGORIES.length) * 100;
+  let kidsHTML = '';
+  for (let i = 1; i <= 8; i++) {
+    kidsHTML += `<button class="kid-btn" onclick="selectKids(${i})">${i}</button>`;
+  }
+
+  document.getElementById('quiz').innerHTML = `
+    <div class="quiz-header" style="background:${cat.bg}">
+      <h2>${cat.title}</h2>
+      <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+    </div>
+    <div class="quiz-body" style="background:${cat.bg}">
+      <div class="kids-title">כמה ילדים קטנים?</div>
+      <div class="kids-grid">${kidsHTML}</div>
+    </div>
+    <div class="quiz-footer">
+      <button class="back-btn" onclick="goBack()">→ חזרה</button>
+    </div>`;
+
+  document.getElementById('quiz').style.background = cat.bg;
+}
+
 function selectOption(index) {
   const cat = CATEGORIES[currentStep];
 
   if (index >= 0 && cat.options[index].needsKids) {
-    openKidsModal(index);
+    pickingKids = true;
+    pendingKidsOption = index;
+    renderQuiz();
     return;
   }
 
@@ -610,19 +559,19 @@ function selectOption(index) {
   advance();
 }
 
-function selectWithKids(optionIndex, kids) {
+function selectKids(count) {
   const cat = CATEGORIES[currentStep];
-  const basePoints = cat.options[optionIndex].points;
-  const totalPoints = basePoints * kids;
-  const text = `${cat.options[optionIndex].text} (${kids} ילדים)`;
+  const opt = cat.options[pendingKidsOption];
+  const totalPoints = opt.points * count;
+  const text = `${opt.text} (${count} ילדים)`;
 
-  answers[cat.id] = { optionIndex, points: totalPoints, text, kids };
-  closeKidsModal();
+  answers[cat.id] = { optionIndex: pendingKidsOption, points: totalPoints, text, kids: count };
+  pickingKids = false;
+  pendingKidsOption = -1;
   advance();
 }
 
 function advance() {
-  direction = 'forward';
   if (currentStep < CATEGORIES.length - 1) {
     currentStep++;
     applyTransition('quiz', 'forward');
@@ -633,7 +582,12 @@ function advance() {
 }
 
 function goBack() {
-  direction = 'backward';
+  if (pickingKids) {
+    pickingKids = false;
+    pendingKidsOption = -1;
+    renderQuiz();
+    return;
+  }
   if (currentStep > 0) {
     currentStep--;
     applyTransition('quiz', 'backward');
@@ -648,7 +602,7 @@ function applyTransition(pageId, dir) {
   el.style.transition = 'none';
   el.classList.remove('active');
   el.classList.add(dir === 'forward' ? 'hidden-right' : 'hidden-left');
-  el.offsetHeight; // force reflow
+  el.offsetHeight;
   el.style.transition = '';
   el.classList.remove('hidden-right', 'hidden-left');
   el.classList.add('active');
@@ -656,45 +610,12 @@ function applyTransition(pageId, dir) {
 
 function show(showId, hideId, dir) {
   const d = dir || 'forward';
-  const showEl = document.getElementById(showId);
-  const hideEl = document.getElementById(hideId);
-
-  hideEl.classList.remove('active');
-  hideEl.classList.add(d === 'forward' ? 'hidden-right' : 'hidden-left');
-
-  showEl.classList.remove('hidden-right', 'hidden-left');
-  showEl.classList.add('active');
+  document.getElementById(hideId).classList.remove('active');
+  document.getElementById(hideId).classList.add(d === 'forward' ? 'hidden-right' : 'hidden-left');
+  document.getElementById(showId).classList.remove('hidden-right', 'hidden-left');
+  document.getElementById(showId).classList.add('active');
 }
 
-// Kids modal
-let _modalOpenTime = 0;
-
-function openKidsModal(optionIndex) {
-  const grid = document.getElementById('kidsGrid');
-  grid.innerHTML = '';
-  for (let i = 1; i <= 8; i++) {
-    const btn = document.createElement('button');
-    btn.className = 'kid-btn';
-    btn.textContent = i;
-    btn.onclick = () => selectWithKids(optionIndex, i);
-    grid.appendChild(btn);
-  }
-  const modal = document.getElementById('kidsModal');
-  modal.classList.add('show');
-  _modalOpenTime = Date.now();
-}
-
-function closeKidsModal() {
-  document.getElementById('kidsModal').classList.remove('show');
-}
-
-document.getElementById('kidsModal').addEventListener('click', function(e) {
-  if (e.target === this && Date.now() - _modalOpenTime > 400) {
-    closeKidsModal();
-  }
-});
-
-// Results
 function showResults() {
   let total = 0;
   const rows = CATEGORIES.map(cat => {
@@ -751,6 +672,7 @@ function showResults() {
 function restart() {
   currentStep = 0;
   answers = {};
+  pickingKids = false;
   show('landing', 'results', 'backward');
 }
 </script>
