@@ -671,6 +671,7 @@ function showResults() {
 
   document.getElementById('results').style.background = bgGradient;
   show('results', 'quiz');
+  if (window.goatcounter) window.goatcounter.count({ path: '/completed', title: 'Quiz Completed', event: true });
 }
 
 function restart() {
@@ -680,6 +681,9 @@ function restart() {
   show('landing', 'results', 'backward');
 }
 </script>
+
+<script data-goatcounter="https://itzikbachar.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 
 </body>
 </html>
