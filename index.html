@@ -641,10 +641,14 @@ function showResults() {
     verdict = 'תוציא קיטור חביבי!';
     bgGradient = 'linear-gradient(170deg, #D89040 0%, #B06820 100%)';
     scoreColor = '#FFD080';
-  } else {
+  } else if (total <= 90) {
     emoji = '👑🦁';
     verdict = 'אתה הארי המקטר!';
     bgGradient = 'linear-gradient(170deg, #DAA520 0%, #8B6914 100%)';
+  } else {
+    emoji = '🔥👑🦁👑🔥';
+    verdict = 'אתה מלך מלכי המקטרים! שאף אחד לא יעיז להגיד לך אחרת!';
+    bgGradient = 'linear-gradient(170deg, #FF4500 0%, #8B0000 100%)';
     scoreColor = '#FFD700';
   }
 
