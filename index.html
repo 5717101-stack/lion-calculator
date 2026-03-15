@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#C8941E">
+  <title>מחשבון הארי המקטר</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #6A9FD8;
+      --blue-light: #D6E6F5;
+      --green: #7DC47F;
+      --green-light: #D9F0DA;
+      --orange: #EFA85A;
+      --orange-light: #FAEBD7;
+      --yellow: #E8D44D;
+      --yellow-light: #FBF5D0;
+      --teal: #5BBAA6;
+      --teal-light: #D4F0EA;
+      --beige: #BBA87A;
+      --beige-light: #F0E8D8;
+      --purple: #A07CC0;
+      --purple-light: #E8DCF0;
+      --gold: #C8941E;
+      --radius: 14px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Rubik', sans-serif;
+      background: #1a1a1a;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: transform 0.4s cubic-bezier(.4,0,.2,1), opacity 0.4s ease;
+      will-change: transform, opacity;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .page.hidden-right {
+      transform: translateX(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .page.hidden-left {
+      transform: translateX(100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .page.active {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ===== LANDING PAGE ===== */
+    #landing {
+      background: linear-gradient(165deg, #F5DEB3 0%, #DAA520 40%, #B8860B 70%, #8B6914 100%);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      gap: 16px;
+    }
+
+    .lion-emoji {
+      font-size: clamp(100px, 30vw, 200px);
+      line-height: 1;
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,0.3));
+      animation: breathe 4s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .landing-title {
+      font-size: clamp(28px, 7vw, 48px);
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 3px 12px rgba(0,0,0,0.4);
+      line-height: 1.2;
+    }
+
+    .landing-subtitle {
+      font-size: clamp(14px, 3.5vw, 20px);
+      color: rgba(255,255,255,0.85);
+      font-weight: 500;
+    }
+
+    .cta-btn {
+      margin-top: 12px;
+      padding: 16px 40px;
+      font-size: clamp(18px, 4.5vw, 24px);
+      font-weight: 700;
+      font-family: 'Rubik', sans-serif;
+      color: #8B6914;
+      background: #fff;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .cta-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    /* ===== QUIZ PAGES ===== */
+    .quiz-page {
+      padding: 0;
+    }
+
+    .quiz-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 20px 20px 16px;
+      text-align: center;
+    }
+
+    .quiz-header h2 {
+      font-size: clamp(24px, 6vw, 36px);
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .progress-bar {
+      margin-top: 12px;
+      height: 6px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #fff;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    .quiz-body {
+      flex: 1;
+      padding: 8px 16px;
+      padding-bottom: calc(80px + var(--safe-bottom));
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      width: 100%;
+      padding: 16px 20px;
+      font-size: clamp(15px, 3.8vw, 18px);
+      font-weight: 600;
+      font-family: 'Rubik', sans-serif;
+      color: #333;
+      background: rgba(255,255,255,0.92);
+      border: 3px solid transparent;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-align: right;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      line-height: 1.4;
+    }
+
+    .option-btn:active {
+      transform: scale(0.97);
+    }
+
+    .option-btn.selected {
+      border-color: #fff;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.5), 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .option-btn .points-badge {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #666;
+      background: rgba(0,0,0,0.06);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .na-btn {
+      background: rgba(255,255,255,0.5);
+      text-align: center;
+      color: #666;
+      font-weight: 500;
+      border: 2px dashed rgba(255,255,255,0.6);
+    }
+
+    .quiz-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 16px calc(12px + var(--safe-bottom));
+      display: flex;
+      justify-content: center;
+      z-index: 20;
+    }
+
+    .back-btn {
+      padding: 12px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Rubik', sans-serif;
+      color: rgba(255,255,255,0.9);
+      background: rgba(0,0,0,0.2);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: transform 0.15s;
+    }
+
+    .back-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* ===== KIDS MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 20px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.show .modal {
+      transform: scale(1);
+    }
+
+    .modal h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .kids-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .kid-btn {
+      aspect-ratio: 1;
+      font-size: 22px;
+      font-weight: 700;
+      font-family: 'Rubik', sans-serif;
+      color: #333;
+      background: var(--green-light);
+      border: 3px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .kid-btn:active, .kid-btn.selected {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
+    .modal-cancel {
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Rubik', sans-serif;
+      color: #999;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* ===== RESULTS PAGE ===== */
+    #results {
+      align-items: center;
+      padding: 32px 20px calc(32px + var(--safe-bottom));
+      text-align: center;
+      gap: 20px;
+    }
+
+    .result-emoji {
+      font-size: clamp(60px, 20vw, 120px);
+      line-height: 1;
+    }
+
+    .result-score {
+      font-size: clamp(48px, 14vw, 80px);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .result-label {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.7;
+    }
+
+    .result-verdict {
+      font-size: clamp(20px, 5vw, 28px);
+      font-weight: 700;
+      line-height: 1.4;
+      max-width: 340px;
+    }
+
+    .breakdown {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(255,255,255,0.12);
+      border-radius: var(--radius);
+      overflow: hidden;
+      text-align: right;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .breakdown-row:last-child { border-bottom: none; }
+
+    .breakdown-cat {
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.8;
+      flex-shrink: 0;
+    }
+
+    .breakdown-choice {
+      font-size: 12px;
+      opacity: 0.55;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .breakdown-pts {
+      font-size: 15px;
+      font-weight: 700;
+      flex-shrink: 0;
+      min-width: 40px;
+      text-align: left;
+    }
+
+    .restart-btn {
+      margin-top: 8px;
+      padding: 14px 40px;
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'Rubik', sans-serif;
+      color: #fff;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .restart-btn:active {
+      transform: scale(0.95);
+    }
+
+    .score-animate {
+      animation: popIn 0.5s cubic-bezier(.2,1,.3,1) both;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LANDING PAGE -->
+  <div id="landing" class="page active">
+    <div class="lion-emoji">🦁</div>
+    <h1 class="landing-title">מחשבון הארי המקטר</h1>
+    <p class="landing-subtitle">מאת יונתן גרובר</p>
+    <button class="cta-btn" onclick="startQuiz()">🔥 חשב נקודות קיטור</button>
+  </div>
+
+  <!-- QUIZ PAGES (rendered by JS) -->
+  <div id="quiz" class="page quiz-page hidden-left"></div>
+
+  <!-- KIDS MODAL -->
+  <div id="kidsModal" class="modal-overlay" onclick="if(event.target===this)closeKidsModal()">
+    <div class="modal">
+      <h3>כמה ילדים קטנים?</h3>
+      <div class="kids-grid" id="kidsGrid"></div>
+      <button class="modal-cancel" onclick="closeKidsModal()">ביטול</button>
+    </div>
+  </div>
+
+  <!-- RESULTS PAGE -->
+  <div id="results" class="page hidden-left"></div>
+
+<script>
+const CATEGORIES = [
+  {
+    id: 'shelter',
+    title: 'סוג מרחב מוגן',
+    color: 'var(--blue)',
+    bg: 'linear-gradient(170deg, #8BB8E8 0%, #5A8CC8 100%)',
+    options: [
+      { text: 'ממ"ד', points: 1 },
+      { text: 'ממ"ק', points: 3 },
+      { text: 'מקלט בבניין', points: 5 },
+      { text: 'מקלט שכונתי / תחנת רכבת / חניון', points: 20 },
+      { text: 'אין מרחב מוגן', points: 21 },
+    ]
+  },
+  {
+    id: 'family',
+    title: 'מצב משפחתי',
+    color: 'var(--green)',
+    bg: 'linear-gradient(170deg, #96D898 0%, #5DAF60 100%)',
+    options: [
+      { text: 'בזוגיות בלי ילדים קטנים', points: 0 },
+      { text: 'רווק/ה', points: 1 },
+      { text: 'נשוי/אה עם ילדים קטנים עם מסגרות', points: 2 },
+      { text: 'נשוי/אה עם ילדים קטנים בלי מסגרות', points: 20, needsKids: true },
+    ]
+  },
+  {
+    id: 'warDamage',
+    title: 'נזקי מלחמה',
+    color: 'var(--orange)',
+    bg: 'linear-gradient(170deg, #F5C078 0%, #E09030 100%)',
+    options: [
+      { text: 'נפל רסיס על דירה שאני שוכר', points: 5 },
+      { text: 'נפל רסיס על דירה שאני משכיר', points: -5 },
+      { text: 'נפל טיל על דירה שאני שוכר', points: 30 },
+      { text: 'נפל טיל על דירה שאני משכיר', points: -30 },
+    ]
+  },
+  {
+    id: 'military',
+    title: 'מילואים',
+    color: 'var(--yellow)',
+    bg: 'linear-gradient(170deg, #F0E070 0%, #D4B830 100%)',
+    options: [
+      { text: 'גם אני גם בן/בת זוגי לא במילואים', points: 0 },
+      { text: 'אני במילואים ואין לי ילדים קטנים בבית', points: 20 },
+      { text: 'אני במילואים ויש לי ילדים קטנים בבית', points: -20 },
+      { text: 'בעלי/אשתי במילואים ואני עם הילדים לבד בבית', points: 60 },
+    ]
+  },
+  {
+    id: 'employment',
+    title: 'מצב תעסוקתי',
+    color: 'var(--teal)',
+    bg: 'linear-gradient(170deg, #78CCB8 0%, #3EA08A 100%)',
+    options: [
+      { text: 'אני שכיר', points: 0 },
+      { text: 'אני עצמאי בתעשייה ביטחונית', points: -10 },
+      { text: 'אני עצמאי בתחום הצעצועים', points: -10 },
+      { text: 'אני זגג', points: -30 },
+      { text: 'אני עצמאי בתחום מסעדות, תרבות או ספורט', points: 20 },
+      { text: 'אני סטנדאפיסט שכל ההופעות שלו התבטלו וכולם אומרים "בטח זה נותן לך מלא חומרים"', points: 20 },
+    ]
+  },
+  {
+    id: 'misc',
+    title: 'שונות',
+    color: 'var(--beige)',
+    bg: 'linear-gradient(170deg, #D4C4A0 0%, #A89060 100%)',
+    options: [
+      { text: 'אני נהג דן', points: -2 },
+      { text: 'אני עובד בוויז', points: -100 },
+      { text: 'אני הבעלים של וויז', points: -600000000 },
+    ]
+  },
+  {
+    id: 'politics',
+    title: 'נטייה פוליטית',
+    color: 'var(--purple)',
+    bg: 'linear-gradient(170deg, #C0A0E0 0%, #8060B0 100%)',
+    options: [
+      { text: 'הצבעתי לביבי', points: -10 },
+      { text: 'לא הצבעתי לביבי', points: 10 },
+    ]
+  },
+];
+
+let currentStep = 0;
+let answers = {};
+let direction = 'forward';
+
+function startQuiz() {
+  currentStep = 0;
+  answers = {};
+  direction = 'forward';
+  renderQuiz();
+  show('quiz', 'landing');
+}
+
+function renderQuiz() {
+  const cat = CATEGORIES[currentStep];
+  const totalSteps = CATEGORIES.length;
+  const progress = ((currentStep + 1) / totalSteps) * 100;
+  const prev = answers[cat.id];
+
+  let optionsHTML = cat.options.map((opt, i) => {
+    const sel = prev && prev.optionIndex === i ? 'selected' : '';
+    const pts = opt.points >= 0 ? `+${opt.points.toLocaleString()}` : opt.points.toLocaleString();
+    const ptsLabel = opt.needsKids ? `${pts} × מס׳ ילדים` : pts;
+    return `<button class="option-btn ${sel}" onclick="selectOption(${i})">
+      ${opt.text}
+      <span class="points-badge">${ptsLabel} נק׳</span>
+    </button>`;
+  }).join('');
+
+  const naSelected = prev && prev.optionIndex === -1 ? 'selected' : '';
+
+  document.getElementById('quiz').innerHTML = `
+    <div class="quiz-header" style="background:${cat.bg}">
+      <h2>${cat.title}</h2>
+      <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+    </div>
+    <div class="quiz-body" style="background:${cat.bg}">
+      ${optionsHTML}
+      <button class="option-btn na-btn ${naSelected}" onclick="selectOption(-1)">
+        לא רלוונטי
+        <span class="points-badge">0 נק׳</span>
+      </button>
+    </div>
+    <div class="quiz-footer">
+      <button class="back-btn" onclick="goBack()">→ חזרה</button>
+    </div>`;
+
+  document.getElementById('quiz').style.background = cat.bg;
+}
+
+function selectOption(index) {
+  const cat = CATEGORIES[currentStep];
+
+  if (index >= 0 && cat.options[index].needsKids) {
+    openKidsModal(index);
+    return;
+  }
+
+  const points = index === -1 ? 0 : cat.options[index].points;
+  const text = index === -1 ? 'לא רלוונטי' : cat.options[index].text;
+
+  answers[cat.id] = { optionIndex: index, points, text, kids: null };
+  advance();
+}
+
+function selectWithKids(optionIndex, kids) {
+  const cat = CATEGORIES[currentStep];
+  const basePoints = cat.options[optionIndex].points;
+  const totalPoints = basePoints * kids;
+  const text = `${cat.options[optionIndex].text} (${kids} ילדים)`;
+
+  answers[cat.id] = { optionIndex, points: totalPoints, text, kids };
+  closeKidsModal();
+  advance();
+}
+
+function advance() {
+  direction = 'forward';
+  if (currentStep < CATEGORIES.length - 1) {
+    currentStep++;
+    applyTransition('quiz', 'forward');
+    renderQuiz();
+  } else {
+    showResults();
+  }
+}
+
+function goBack() {
+  direction = 'backward';
+  if (currentStep > 0) {
+    currentStep--;
+    applyTransition('quiz', 'backward');
+    renderQuiz();
+  } else {
+    show('landing', 'quiz', 'backward');
+  }
+}
+
+function applyTransition(pageId, dir) {
+  const el = document.getElementById(pageId);
+  el.style.transition = 'none';
+  el.classList.remove('active');
+  el.classList.add(dir === 'forward' ? 'hidden-right' : 'hidden-left');
+  el.offsetHeight; // force reflow
+  el.style.transition = '';
+  el.classList.remove('hidden-right', 'hidden-left');
+  el.classList.add('active');
+}
+
+function show(showId, hideId, dir) {
+  const d = dir || 'forward';
+  const showEl = document.getElementById(showId);
+  const hideEl = document.getElementById(hideId);
+
+  hideEl.classList.remove('active');
+  hideEl.classList.add(d === 'forward' ? 'hidden-right' : 'hidden-left');
+
+  showEl.classList.remove('hidden-right', 'hidden-left');
+  showEl.classList.add('active');
+}
+
+// Kids modal
+function openKidsModal(optionIndex) {
+  const grid = document.getElementById('kidsGrid');
+  grid.innerHTML = '';
+  for (let i = 1; i <= 8; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'kid-btn';
+    btn.textContent = i;
+    btn.onclick = () => selectWithKids(optionIndex, i);
+    grid.appendChild(btn);
+  }
+  document.getElementById('kidsModal').classList.add('show');
+}
+
+function closeKidsModal() {
+  document.getElementById('kidsModal').classList.remove('show');
+}
+
+// Results
+function showResults() {
+  let total = 0;
+  const rows = CATEGORIES.map(cat => {
+    const ans = answers[cat.id];
+    const pts = ans ? ans.points : 0;
+    total += pts;
+    return { title: cat.title, text: ans ? ans.text : 'לא רלוונטי', points: pts };
+  });
+
+  let emoji, verdict, bgGradient, scoreColor;
+  if (total < 0) {
+    emoji = '🚫';
+    verdict = 'אין לך זכות לקטר!';
+    bgGradient = 'linear-gradient(170deg, #4A4A4A 0%, #2A2A2A 100%)';
+    scoreColor = '#FF6B6B';
+  } else if (total <= 20) {
+    emoji = '☁️';
+    verdict = 'אתה יכול לקטר ממש בקטנה...';
+    bgGradient = 'linear-gradient(170deg, #6A8CAA 0%, #3A5A7A 100%)';
+    scoreColor = '#A0C8E8';
+  } else if (total <= 40) {
+    emoji = '😤';
+    verdict = 'תוציא קיטור חביבי!';
+    bgGradient = 'linear-gradient(170deg, #D89040 0%, #B06820 100%)';
+    scoreColor = '#FFD080';
+  } else {
+    emoji = '👑🦁';
+    verdict = 'אתה הארי המקטר!';
+    bgGradient = 'linear-gradient(170deg, #DAA520 0%, #8B6914 100%)';
+    scoreColor = '#FFD700';
+  }
+
+  const breakdownHTML = rows.map(r => {
+    const ptsStr = r.points >= 0 ? `+${r.points.toLocaleString()}` : r.points.toLocaleString();
+    return `<div class="breakdown-row">
+      <span class="breakdown-cat">${r.title}</span>
+      <span class="breakdown-choice">${r.text}</span>
+      <span class="breakdown-pts" style="color:${r.points >= 0 ? '#8F8' : '#F88'}">${ptsStr}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('results').innerHTML = `
+    <div class="result-emoji score-animate">${emoji}</div>
+    <div class="result-score score-animate" style="color:${scoreColor}">${total.toLocaleString()}</div>
+    <div class="result-label" style="color:rgba(255,255,255,0.6)">נק"ט (נקודות קיטור)</div>
+    <div class="result-verdict" style="color:#fff">${verdict}</div>
+    <div class="breakdown">${breakdownHTML}</div>
+    <button class="restart-btn" onclick="restart()">🔄 התחל מחדש</button>`;
+
+  document.getElementById('results').style.background = bgGradient;
+  show('results', 'quiz');
+}
+
+function restart() {
+  currentStep = 0;
+  answers = {};
+  show('landing', 'results', 'backward');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: lion-calculator
+    runtime: static
+    buildCommand: mkdir -p public && cp index.html public/
+    staticPublishPath: public
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=3600
