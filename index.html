@@ -446,7 +446,7 @@
   <div id="results" class="page hidden-left"></div>
 
   <!-- KIDS MODAL (must be last in DOM for mobile z-index) -->
-  <div id="kidsModal" class="modal-overlay" onclick="if(event.target===this)closeKidsModal()">
+  <div id="kidsModal" class="modal-overlay">
     <div class="modal">
       <h3>כמה ילדים קטנים?</h3>
       <div class="kids-grid" id="kidsGrid"></div>
@@ -564,7 +564,7 @@ function renderQuiz() {
     const sel = prev && prev.optionIndex === i ? 'selected' : '';
     const pts = opt.points >= 0 ? `+${opt.points.toLocaleString()}` : opt.points.toLocaleString();
     const ptsLabel = opt.needsKids ? `${pts} × מס׳ ילדים` : pts;
-    return `<button class="option-btn ${sel}" onclick="selectOption(${i})">
+    return `<button class="option-btn ${sel}" ontouchend="event.preventDefault(); selectOption(${i})" onclick="selectOption(${i})">
       ${opt.text}
       <span class="points-badge">${ptsLabel} נק׳</span>
     </button>`;
@@ -663,6 +663,8 @@ function show(showId, hideId, dir) {
 }
 
 // Kids modal
+let _modalOpenTime = 0;
+
 function openKidsModal(optionIndex) {
   const grid = document.getElementById('kidsGrid');
   grid.innerHTML = '';
@@ -673,12 +675,20 @@ function openKidsModal(optionIndex) {
     btn.onclick = () => selectWithKids(optionIndex, i);
     grid.appendChild(btn);
   }
-  document.getElementById('kidsModal').classList.add('show');
+  const modal = document.getElementById('kidsModal');
+  modal.classList.add('show');
+  _modalOpenTime = Date.now();
 }
 
 function closeKidsModal() {
   document.getElementById('kidsModal').classList.remove('show');
 }
+
+document.getElementById('kidsModal').addEventListener('click', function(e) {
+  if (e.target === this && Date.now() - _modalOpenTime > 400) {
+    closeKidsModal();
+  }
+});
 
 // Results
 function showResults() {
